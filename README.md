@@ -9,7 +9,7 @@ g++ src/*.cpp -Isrc -o bin/sfmlGame.exe -Isrc\include -Lsrc\lib -lsfml-graphics 
 To run the program:
 
 ```bash
-./src/sfmlGame
+start bin/sfmlGame
 ```
 
 Note, there is also the Makefile which, in theory, should provide the object and executable files within the root directory, however, my computer has issues attempting to run cmake which I cannot be bothered fixing at the moment so I take no responsibility if it doesn't work.

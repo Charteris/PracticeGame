@@ -1,23 +1,33 @@
-#include <SFML/Graphics.hpp>
+#include "header.hpp"
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
+    // Simple circle rendering
+    int width = 200, height = 200;
+    sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!");
     sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Green);
 
+    int frames = 0;
+    sf::Clock clock;
+    clock.restart();
     while (window.isOpen())
     {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
+        // Support events
+        manageEvents(window);
 
+        // Clear screen, render items, and display new buffer
         window.clear();
         window.draw(shape);
         window.display();
+
+        // Print frames per second
+        ++frames;
+        if (clock.getElapsedTime().asSeconds() >= 1) { 
+            std::cout << "FPS: " << frames << std::endl;
+            clock.restart();
+            frames = 0;
+        }
     }
 
     return 0;
