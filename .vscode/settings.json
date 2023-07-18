@@ -67,6 +67,8 @@
     "optional": "cpp",
     "ratio": "cpp",
     "stop_token": "cpp",
-    "thread": "cpp"
+    "thread": "cpp",
+    "unordered_map": "cpp",
+    "xhash": "cpp"
   }
 }

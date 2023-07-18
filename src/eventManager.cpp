@@ -1,4 +1,4 @@
-#include "header.hpp"
+#include "Header.hpp"
 
 void manageEvents(sf::RenderWindow &window) {
   sf::Event event;

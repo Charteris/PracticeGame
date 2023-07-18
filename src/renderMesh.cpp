@@ -1,4 +1,4 @@
-#include "mesh.hpp"
+#include "Mesh.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -11,7 +11,7 @@ std::vector<T> split(const std::string &ref, const char delimiter = ' ') {
   int start = 0, index = 0;
   std::vector<T> result;
   T tempValue;
-  
+
   // Extract terms separated by delimiter
   do {
     if (ref[index] == delimiter || ref[index] == '\0') {
@@ -20,7 +20,7 @@ std::vector<T> split(const std::string &ref, const char delimiter = ' ') {
         std::stringstream typeCast(ref.substr(start, index));
         typeCast >> tempValue;
       }
-      result.push_back(tempValue);
+      result.emplace_back(tempValue);
       start = index + 1;
     }
   } while (++index < ref.length());
@@ -28,7 +28,7 @@ std::vector<T> split(const std::string &ref, const char delimiter = ' ') {
   // Add final term to results
   std::stringstream typeCast(ref.substr(start, index));
   typeCast >> tempValue;
-  result.push_back(tempValue);
+  result.emplace_back(tempValue);
   return result;
 }
 
@@ -51,7 +51,7 @@ std::vector<Face> readFace(const std::string &line) {
   while (stream) {
     stream >> substring;
     indecies = split<int>(substring, '/');
-    formation.push_back(Face(indecies[0], indecies[1], indecies[2]));
+    formation.emplace_back(Face(indecies[0], indecies[1], indecies[2]));
   }
 
   return formation;
@@ -67,14 +67,14 @@ void Mesh::readFromFile(const char* filename) {
     while (getline(file, line)) {
       if (line[0] == 'v') {
         if (line[1] == 't') {
-          textures.push_back(readPoint(line));
+          textures.emplace_back(readPoint(line));
         } else if (line[1] == 'n') {
-          normals.push_back(readPoint(line));
+          normals.emplace_back(readPoint(line));
         } else if (line[1] == ' ') {
-          vertices.push_back(readPoint(line));
+          vertices.emplace_back(readPoint(line));
         }
       } else if (line[0] == 'f') {
-        faces.push_back(readFace(line));
+        faces.emplace_back(readFace(line));
       }
     }
     file.close();
@@ -97,5 +97,4 @@ void Mesh::troubleshoot() {
 
 Mesh::Mesh(const char* filename) {
   readFromFile(filename);
-  troubleshoot();
 }
