@@ -1,8 +1,16 @@
-#include "Header.hpp"
 
-void manageEvents(sf::RenderWindow &window) {
+#include <math.h>
+
+#include <SFML/Graphics.hpp>
+
+#include "Mesh.hpp"
+
+#define _USE_MATH_DEFINES
+
+void manageEvents(sf::RenderWindow &window, Camera &camera) {
   sf::Event event;
   int width, height;
+  float rotationFactor = M_PI / 180.0f;
   while (window.pollEvent(event))
   {
     switch (event.type) {
@@ -11,8 +19,32 @@ void manageEvents(sf::RenderWindow &window) {
         break;
 
       case sf::Event::KeyPressed:
-        if (event.key.scancode == sf::Keyboard::Scan::Escape)
+        if (event.key.scancode == sf::Keyboard::Scan::Escape) // Exit
           window.close();
+        else if (event.key.scancode == sf::Keyboard::Scan::W) // Move camera
+          camera.moveCamera(sf::Vector3f(0, 0, 2));
+        else if (event.key.scancode == sf::Keyboard::Scan::D)
+          camera.moveCamera(sf::Vector3f(2, 0, 0));
+        else if (event.key.scancode == sf::Keyboard::Scan::S)
+          camera.moveCamera(sf::Vector3f(0, 0, -2));
+        else if (event.key.scancode == sf::Keyboard::Scan::A)
+          camera.moveCamera(sf::Vector3f(-2, 0, 0));
+        else if (event.key.scancode == sf::Keyboard::Scan::LShift)
+          camera.moveCamera(sf::Vector3f(0, -2, 0));
+        else if (event.key.scancode == sf::Keyboard::Scan::Space)
+          camera.moveCamera(sf::Vector3f(0, 2, 0));
+        else if (event.key.scancode == sf::Keyboard::Scan::Q) // Rotate camera
+          camera.rotateCamera(sf::Vector3f(0, -rotationFactor, 0));
+        else if (event.key.scancode == sf::Keyboard::Scan::E)
+          camera.rotateCamera(sf::Vector3f(0, rotationFactor, 0));
+        else if (event.key.scancode == sf::Keyboard::Scan::Z)
+          camera.rotateCamera(sf::Vector3f(0, 0, -rotationFactor));
+        else if (event.key.scancode == sf::Keyboard::Scan::C)
+          camera.rotateCamera(sf::Vector3f(0, 0, rotationFactor));
+        else if (event.key.scancode == sf::Keyboard::Scan::F)
+          camera.rotateCamera(sf::Vector3f(-rotationFactor, 0, 0));
+        else if (event.key.scancode == sf::Keyboard::Scan::R)
+          camera.rotateCamera(sf::Vector3f(rotationFactor, 0, 0));
         break;
 
       case sf::Event::Resized:
@@ -38,8 +70,8 @@ void manageEvents(sf::RenderWindow &window) {
         break;
 
       case sf::Event::TextEntered:
-        if (event.text.unicode < 128)
-          std::cout << static_cast<char>(event.text.unicode);
+        // if (event.text.unicode < 128)
+        //   std::cout << static_cast<char>(event.text.unicode);
         break;
 
       case sf::Event::MouseWheelScrolled:

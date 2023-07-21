@@ -1,11 +1,20 @@
-#include "Mesh.hpp"
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 
-// Splits string by delimiter an typecasts to specific value
+#include <SFML/Graphics.hpp>
+
+#include "Mesh.hpp"
+
+/**
+ * Splits string into vector based on delimiters
+ * @tparam T The template class of the output vector
+ * @param ref The reference string being split
+ * @param delimiter The delimiter to split by @def{" "}
+ * @return A typecast vector of terms split from string
+*/
 template <class T>
 std::vector<T> split(const std::string &ref, const char delimiter = ' ') {
   int start = 0, index = 0;
@@ -32,17 +41,27 @@ std::vector<T> split(const std::string &ref, const char delimiter = ' ') {
   return result;
 }
 
-Point readPoint(const std::string &line) {
+/**
+ * Reads point data from a stringstream
+ * @param line The line being interpreted - i.e. "v x y z"
+ * @return The point object derived from the line
+*/
+sf::Vector3f readPoint(const std::string &line) {
   std::istringstream stream(line);
   std::string prefix;
   float x, y, z;
   stream >> prefix >> x >> y >> z;
-  return Point(x, y, z);
+  return sf::Vector3f(x, y, z);
 }
 
-std::vector<Face> readFace(const std::string &line) {
+/**
+ * Reads face data from a stringstream which contains a dynamic length list of vertex, texture, and normal indicies comprising the face.
+ * @param line The line being interpreted - i.e. "f iv1/it1/in1 iv2/it2/in2 ..."
+ * @return A vector of sub-faces comprising a face
+*/
+std::vector<sf::Vector3f> readFace(const std::string &line) {
   std::istringstream stream(line);
-  std::vector<Face> formation;
+  std::vector<sf::Vector3f> formation;
   std::string substring;
   std::vector<int> indecies;
   int v, t, n; // vertex, texture, normal
@@ -51,12 +70,24 @@ std::vector<Face> readFace(const std::string &line) {
   while (stream) {
     stream >> substring;
     indecies = split<int>(substring, '/');
-    formation.emplace_back(Face(indecies[0], indecies[1], indecies[2]));
+    formation.emplace_back(sf::Vector3f(indecies[0], indecies[1], indecies[2]));
   }
 
   return formation;
 }
 
+/**
+ * Default constructor which reads a specified .obj file
+ * @param filename The name of the .obj file
+*/
+Mesh::Mesh(const char* filename) {
+  readFromFile(filename);
+}
+
+/**
+ * Interprets a .obj file and stores it in the Mesh object
+ * @param filename The name of the .obj file being interpreted
+*/
 void Mesh::readFromFile(const char* filename) {
   std::string line;
   std::ifstream file(filename);
@@ -81,20 +112,43 @@ void Mesh::readFromFile(const char* filename) {
   }
 }
 
-void Mesh::troubleshoot() {
-  std::cout << "Vertices: " << std::endl;
-  for (auto vertex : vertices) vertex.print();
-  std::cout << "Textures: " << std::endl;
-  for (auto texture : textures) texture.print();
-  std::cout << "Normals: " << std::endl;
-  for (auto normal : normals) normal.print();
-  std::cout << "Faces: " << std::endl;
-  for (auto fullFaces : faces) {
-    for (auto face : fullFaces) face.print();
-    std::cout << std::endl;
-  }
+/**
+ * Extracts a vertex of circle shapes to be rendered, representing the vertices of the mesh
+ * @param position The position of the mesh in 3D space - relative to the camera
+ * @param rotation The orientation of the mesh in 3D space (pitch/roll/yaw)
+ * @return A vector of SFML circle shapes of vertices projected from 3D to 2D space
+*/
+std::vector<sf::CircleShape> Mesh::renderVertices(
+  const sf::Vector3f &position, const sf::Vector3f &rotation
+) {
+  std::vector<sf::CircleShape> renderVertices;
+  Matrix rotationMatrix = getRotationMatrix(rotation), projectedMatrix;
+  sf::Vector3f rotated, projected, offset;
+  float scale, distance = 2;
+
+  sf::CircleShape tempShape(5);
+  tempShape.setFillColor(sf::Color::Black);
+
+  for (auto vertex : vertices) {
+    // Rotate mesh in 3D space
+    rotated = rotationMatrix * vertex;
+    // Project onto 2D space
+    // rotated /= (distance - rotated.z);
+    // Add offset for position based on view angle
+    rotated += (position - offset);
+
+    tempShape.setPosition(rotated.x, rotated.y);
+    renderVertices.emplace_back(tempShape);
+  } 
+  return renderVertices;
 }
 
-Mesh::Mesh(const char* filename) {
-  readFromFile(filename);
-}
+// std::vector<sf::ConvexShape> getFaces(
+//   const sf::Vector3f &position, const sf::Vector3f &camera, const sf::Vector3f &rotation
+// ) {
+//   std::vector<sf::ConvexShape> renderVertices;
+//   Matrix rotationMatrix = getRotationMatrix(rotation);
+//   sf::Vector3f projectedVertex, offset = position - camera;
+
+//   sf::ConvexShape 
+// }

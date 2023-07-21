@@ -3,25 +3,9 @@
 
 #include <iostream>
 #include <vector>
+#include <math.h>
 
-/**
- * Defines a simple struct for storing 3D vectors and vertices
-*/
-struct Point {
-  float x, y, z;
-  Point(float _x, float _y, float _z) : x(_x), y(_y), z(_z) { };
-  void print() { std::cout << "(" << x << ", " << y << ", " << z << "), "; }
-};
-
-/**
- * Defines a simple struct for storing faces. 
- * Note: A Face consists of a reference index to the vertex, texture and normal vectors which comprise it.
-*/
-struct Face {
-  int vertex, texture, normal; // relevant indecies per vertex, texture, and normal vector
-  Face(int v, int t, int n) : vertex(v), texture(t), normal(n) { };
-  void print() { std::cout << "(" << vertex << ", " << texture << ", " << normal << "), "; }
-};
+#include <SFML/Graphics.hpp>
 
 /**
  * Defines a mesh object for rendering 3D meshes from .obj files
@@ -29,19 +13,67 @@ struct Face {
 class Mesh {
   private:
     // Vertices define the points comprising the object
-    std::vector<Point> vertices;
+    std::vector<sf::Vector3f> vertices;
     // Textures define the textures across faces
-    std::vector<Point> textures;
+    std::vector<sf::Vector3f> textures;
     // Normals define the normal vectors used for rendering faces
-    std::vector<Point> normals;
+    std::vector<sf::Vector3f> normals;
     // Faces define the points and normal vector comprising a face
-    std::vector<std::vector<Face>> faces;
+    std::vector<std::vector<sf::Vector3f>> faces;
     
   public:
+    Mesh() { };
     Mesh(const char*);
     void readFromFile(const char*);
-    void troubleshoot();
-    // void render();
+    std::vector<sf::Vector3f> getVertices() { return vertices; };
+    void scaleMesh(float factor) { 
+      for (auto &vertex : vertices) vertex *= factor; 
+      for (auto &normal : normals) normal *= factor; 
+    };
+    std::vector<sf::CircleShape> renderVertices(const sf::Vector3f&, const sf::Vector3f&);
+    // std::vector<sf::ConvexShape> renderFaces();
 };
+
+/**
+ * Simple Camera implementation for projecting 3D meshes
+*/
+class Camera {
+  private:
+    sf::Vector3f position;
+    sf::Vector3f orientation;
+  
+  public:
+    Camera() { };
+    Camera(sf::Vector3f pos) : position(pos) { };
+    Camera(sf::Vector3f pos, sf::Vector3f o) : position(pos), orientation(o) { };
+    void moveCamera(sf::Vector3f velocity) { position += velocity; };
+    void rotateCamera(sf::Vector3f rotation) { orientation += rotation; };
+    sf::Vector3f getPosition() { return position; };
+    sf::Vector3f getOrientation() { return orientation; };
+    float getX() { return position.x; };
+    float getY() { return position.y; };
+    float getZ() { return position.z; };
+    float getAngleX() { return orientation.x; };
+    float getAngleY() { return orientation.y; };
+    float getAngleZ() { return orientation.z; };
+};
+
+/**
+ * Defines a simple Matrix struct
+*/
+struct Matrix {
+  sf::Vector3f A, B, C;
+  Matrix() { };
+  Matrix(sf::Vector3f a,sf::Vector3f b,sf::Vector3f c) : A(a), B(b), C(c) { };
+  Matrix operator*(const Matrix&);
+  sf::Vector3f operator*(const sf::Vector3f&);
+};
+
+Matrix xProjection(float);
+Matrix yProjection(float);
+Matrix zProjection(float);
+Matrix getRotationMatrix(sf::Vector3f);
+Matrix getProjectionMatrix(sf::Vector3f);
+float getMagnitude(sf::Vector3f);
 
 #endif

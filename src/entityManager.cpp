@@ -1,4 +1,3 @@
-#include "EntityManager.hpp"
 
 #include <unordered_map>
 #include <fstream>
@@ -8,6 +7,8 @@
 #include <format>
 
 #include <SFML/Graphics.hpp>
+
+#include "EntityManager.hpp"
 
 #define BUFFER_SIZE 20
 
@@ -183,7 +184,7 @@ void EntityManager::addFromFile(const char* filename, float pixelSize, sf::Vecto
 }
 
 /**
- * Destructs all existing entities
+ * Default destructor to clear all existing entities
 */
 EntityManager::~EntityManager() { 
   entities.clear();
