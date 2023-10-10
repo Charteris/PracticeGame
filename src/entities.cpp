@@ -20,8 +20,7 @@ MeshEntity::MeshEntity(
   position3D = pos;
   position = sf::Vector2f(pos.x, pos.y);
   camera = cam;
-  mesh.readFromFile(objFile);
-  mesh.scaleMesh(scale);
+  mesh.readFromFile(objFile, scale);
 }
 
 /**
@@ -29,13 +28,31 @@ MeshEntity::MeshEntity(
  * @param window The render window to be drawn on
 */
 void MeshEntity::render(sf::RenderWindow &window) {
-  sf::Vector2u windowSize = window.getSize();
   sf::Vector3f camAngle = camera->getOrientation(), camPos = camera->getPosition();
-  sf::Vector3f relativePos = position3D - camPos;
-  // TODO: Only add by camera angle if the object is selected - updates the rotation of the mesh
-  sf::Vector3f viewAngle = rotation + camAngle;
 
-  std::vector<sf::CircleShape> vertices = mesh.renderVertices(relativePos, viewAngle);
-  for (auto vertex : vertices)
+  // TODO: Only add by camera angle and position if the object is selected
+  sf::Vector3f relativePos = position3D - camPos;
+  sf::Vector3f viewAngle = rotation - camAngle;
+  std::vector<sf::Vector2f> projectedVertices = mesh.projectVertices(relativePos, viewAngle);
+
+  // Only render vertices which are within the window bounds
+  std::vector<sf::ConvexShape> faces = mesh.renderFaces(window, projectedVertices);
+  for (auto face : faces) {
+    // Could be used for displaying edges but there are infinite perspective lines
+    face.setOutlineThickness(0); 
+    window.draw(face);
+  }
+
+  // Renders the edges of each face
+  std::vector<sf::VertexArray> edges = mesh.renderEdges(window, projectedVertices);
+  for (auto edge : edges) {
+    window.draw(edge);
+  }
+
+  // Renders the points for each vertex
+  std::vector<sf::CircleShape> vertices = mesh.renderVertices(window, projectedVertices);
+  for (auto vertex : vertices) {
+    vertex.setScale(1 / relativePos.z, 1 / relativePos.z);
     window.draw(vertex);
+  }
 }

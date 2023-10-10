@@ -22,11 +22,11 @@ void manageEvents(sf::RenderWindow &window, Camera &camera) {
         if (event.key.scancode == sf::Keyboard::Scan::Escape) // Exit
           window.close();
         else if (event.key.scancode == sf::Keyboard::Scan::W) // Move camera
-          camera.moveCamera(sf::Vector3f(0, 0, 2));
+          camera.moveCamera(sf::Vector3f(0, 0, 0.1));
+        else if (event.key.scancode == sf::Keyboard::Scan::S)
+          camera.moveCamera(sf::Vector3f(0, 0, -0.1));
         else if (event.key.scancode == sf::Keyboard::Scan::D)
           camera.moveCamera(sf::Vector3f(2, 0, 0));
-        else if (event.key.scancode == sf::Keyboard::Scan::S)
-          camera.moveCamera(sf::Vector3f(0, 0, -2));
         else if (event.key.scancode == sf::Keyboard::Scan::A)
           camera.moveCamera(sf::Vector3f(-2, 0, 0));
         else if (event.key.scancode == sf::Keyboard::Scan::LShift)

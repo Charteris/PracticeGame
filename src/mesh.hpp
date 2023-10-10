@@ -8,6 +8,14 @@
 #include <SFML/Graphics.hpp>
 
 /**
+ * Defines a Face struct used to store relative face information
+*/
+struct Point {
+  int vertex, texture, normal;
+  Point(int v, int t, int n) : vertex(v), texture(t), normal(n) { };
+};
+
+/**
  * Defines a mesh object for rendering 3D meshes from .obj files
 */
 class Mesh {
@@ -19,19 +27,19 @@ class Mesh {
     // Normals define the normal vectors used for rendering faces
     std::vector<sf::Vector3f> normals;
     // Faces define the points and normal vector comprising a face
-    std::vector<std::vector<sf::Vector3f>> faces;
+    std::vector<std::vector<Point>> faces;
+    float scaleFactor = 1;
     
   public:
     Mesh() { };
     Mesh(const char*);
-    void readFromFile(const char*);
+    void readFromFile(const char*, float scale=1);
+    void updateScale(float scale) { scaleFactor = scale; };
     std::vector<sf::Vector3f> getVertices() { return vertices; };
-    void scaleMesh(float factor) { 
-      for (auto &vertex : vertices) vertex *= factor; 
-      for (auto &normal : normals) normal *= factor; 
-    };
-    std::vector<sf::CircleShape> renderVertices(const sf::Vector3f&, const sf::Vector3f&);
-    // std::vector<sf::ConvexShape> renderFaces();
+    std::vector<sf::Vector2f> projectVertices(const sf::Vector3f&, const sf::Vector3f&);
+    std::vector<sf::CircleShape> renderVertices(sf::RenderWindow&, std::vector<sf::Vector2f>&);
+    std::vector<sf::VertexArray> renderEdges(sf::RenderWindow&, std::vector<sf::Vector2f>&);
+    std::vector<sf::ConvexShape> renderFaces(sf::RenderWindow&, std::vector<sf::Vector2f>&);
 };
 
 /**

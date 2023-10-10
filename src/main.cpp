@@ -11,7 +11,7 @@ int main()
   // Simple circle rendering
   const int WIDTH = 1280, HEIGHT = 960;
   sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "SFML App");
-  sf::Color bgColor = sf::Color(150, 150, 150);
+  sf::Color bgColor = sf::Color(sf::Color::White);
   sf::CircleShape shape(100.f);
   shape.setFillColor(sf::Color::Green);
 
@@ -62,7 +62,7 @@ int main()
   long long int counter = 1;
   float step = M_PI/4280;
   std::shared_ptr<MeshEntity> entity = entityManager.addEntity<MeshEntity>(
-    "mesh", sf::Vector3f(WIDTH / 2, HEIGHT / 2, 100.f), &camera, "res/Person_model.obj"
+    "mesh", sf::Vector3f(WIDTH / 2, HEIGHT / 2, 1.f), &camera, "res/Person_model.obj"
   );
 
   // entityManager.addFromFile("res/simpleScene.png");
@@ -101,8 +101,7 @@ int main()
     // Continuous troubleshooting
     ++frames;
     if (clock.getElapsedTime().asSeconds() >= 1) { 
-      // std::cout << "FPS: " << frames << std::endl;
-      // std::cout << "Mouse position: " << pos.x << ", " << pos.y << std::endl;
+      std::cout << "FPS: " << frames << std::endl;
       clock.restart();
       frames = 0;
     }

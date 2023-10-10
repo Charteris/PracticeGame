@@ -51,7 +51,7 @@ sf::Vector3f Matrix::operator*(const sf::Vector3f &other) {
 */
 Matrix xProjection(float theta) { 
   return Matrix(
-    sf::Vector3f(-1, 0, 0), 
+    sf::Vector3f(1, 0, 0), 
     sf::Vector3f(0, cos(theta), -sin(theta)), 
     sf::Vector3f(0, sin(theta), cos(theta))
   );
@@ -64,9 +64,9 @@ Matrix xProjection(float theta) {
 */
 Matrix yProjection(float theta) { 
   return Matrix(
-    sf::Vector3f(cos(theta), 0, -sin(theta)), 
+    sf::Vector3f(cos(theta), 0, sin(theta)), 
     sf::Vector3f(0, -1, 0), 
-    sf::Vector3f(sin(theta), 0, cos(theta))
+    sf::Vector3f(-sin(theta), 0, cos(theta))
   );
 }
 

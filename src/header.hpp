@@ -10,6 +10,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
+// Include classes
 #include "EntityManager.hpp"
 #include "Entities.hpp"
 #include "Mesh.hpp"
