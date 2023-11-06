@@ -1,8 +1,13 @@
+/**
+ * The main execution script for the Radar Simulator project
+ * @author Lachlan Charteris
+*/
 
 #include <memory>
 #include <math.h>
 
 #include "Header.hpp"
+#include "Buttons.hpp"
 
 #define _USE_MATH_DEFINES
 
@@ -41,18 +46,18 @@ int main()
 
   // Define 3D camera
   Camera camera;
+  sf::Vector3f cameraPos = camera.getPosition(), cameraRot = camera.getOrientation();
 
   sf::Text positionText(text);
   std::sprintf(
-    buffer, "Camera Position: (%.3f, %.3f, %.3f)", camera.getX(), camera.getY(), camera.getZ()
+    buffer, "Camera Position: (%.3f, %.3f, %.3f)", cameraPos.x, cameraPos.y, cameraPos.z
   );
   positionText.setString(buffer);
   positionText.setPosition(sf::Vector2f(2, 2));
 
   sf::Text angleText(text);
   std::sprintf(
-    buffer, "Camera Angle: (%.3f, %.3f, %.3f)", 
-    camera.getAngleX(), camera.getAngleY(), camera.getAngleZ()
+    buffer, "Camera Angle: (%.3f, %.3f, %.3f)", cameraRot.x, cameraRot.y, cameraRot.z
   );
   angleText.setString(buffer);
   angleText.setPosition(sf::Vector2f(2, 2 + textSize*1.2));
@@ -60,10 +65,18 @@ int main()
   // Define Entity Manager
   EntityManager entityManager;
   long long int counter = 1;
-  float step = M_PI/4280;
+  float step = M_PI / 4280;
   std::shared_ptr<MeshEntity> entity = entityManager.addEntity<MeshEntity>(
     "mesh", sf::Vector3f(WIDTH / 2, HEIGHT / 2, 1.f), &camera, "res/Person_model.obj"
   );
+
+  // Add UI Entities
+  std::shared_ptr<Button<sf::RectangleShape>> button = 
+    entityManager.addUIElement<Button<sf::RectangleShape>>(
+      "button", sf::Vector2f(WIDTH - 100, HEIGHT / 8), sf::Vector2f(100, 100), []() { 
+        std::cout << "Button Callback" << std::endl;
+      }
+    );
 
   // entityManager.addFromFile("res/simpleScene.png");
   // std::cout << "Length: " << entityManager.size() << std::endl;
@@ -74,7 +87,7 @@ int main()
   while (window.isOpen())
   {
     // Support events
-    manageEvents(window, camera);
+    manageEvents(window, camera, entityManager);
 
     // Clear screen, render items, and display new buffer
     window.clear(bgColor);
@@ -84,14 +97,13 @@ int main()
 
     // Display camera details
     std::sprintf(
-      buffer, "Camera Position: (%.3f, %.3f, %.3f)", camera.getX(), camera.getY(), camera.getZ()
+      buffer, "Camera Position: (%.3f, %.3f, %.3f)", cameraPos.x, cameraPos.y, cameraPos.z
     );
     positionText.setString(buffer);
     window.draw(positionText);
 
     std::sprintf(
-      buffer, "Camera Angle: (%.3f, %.3f, %.3f)", 
-      camera.getAngleX(), camera.getAngleY(), camera.getAngleZ()
+      buffer, "Camera Angle: (%.3f, %.3f, %.3f)", cameraRot.x, cameraRot.y, cameraRot.z
     );
     angleText.setString(buffer);
     window.draw(angleText);
@@ -100,11 +112,12 @@ int main()
 
     // Continuous troubleshooting
     ++frames;
-    if (clock.getElapsedTime().asSeconds() >= 1) { 
-      std::cout << "FPS: " << frames << std::endl;
-      clock.restart();
-      frames = 0;
-    }
+    // if (clock.getElapsedTime().asSeconds() >= 1) { 
+    //   std::cout << "FPS: " << frames << std::endl;
+    //   clock.restart();
+    //   frames = 0;
+    //   button->troubleshoot();
+    // }
   }
 
   return 0;

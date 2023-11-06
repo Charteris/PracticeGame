@@ -1,3 +1,7 @@
+/**
+ * Provides functionality for mesh data objects
+ * @author Lachlan Charteris
+*/
 
 #include <iostream>
 #include <fstream>
@@ -7,6 +11,15 @@
 #include <SFML/Graphics.hpp>
 
 #include "Mesh.hpp"
+#include "Projection.hpp"
+
+/**
+ * Default constructor for the Face structure
+ * @param v The vertex of the new point
+ * @param t The texture of the new point
+ * @param n The normal of the new point
+*/
+Face::Face(int v, int t, int n) : vertex(v), texture(t), normal(n) { };
 
 /**
  * Splits string into vector based on delimiters
@@ -46,7 +59,7 @@ std::vector<T> split(const std::string &ref, const char delimiter = ' ') {
  * @param line The line being interpreted - i.e. "v x y z"
  * @return The point object derived from the line
 */
-sf::Vector3f readPoint(const std::string &line) {
+sf::Vector3f readVertex(const std::string &line) {
   std::istringstream stream(line);
   std::string prefix;
   float x, y, z;
@@ -56,25 +69,26 @@ sf::Vector3f readPoint(const std::string &line) {
 
 /**
  * Reads face data from a stringstream which contains a dynamic length list of vertex, texture, and normal indicies comprising the face.
- * @param line The line being interpreted - i.e. "f iv1/it1/in1 iv2/it2/in2 ..."
+ * @param line A string describing the face in the form: "f iv1/it1/in1 iv2/it2/in2 ..."
  * @return A vector of sub-faces comprising a face
 */
-std::vector<Point> readFace(const std::string &line) {
+std::vector<Face> readFace(const std::string &line) {
   std::istringstream stream(line);
-  std::vector<Point> formation;
+  std::vector<Face> formation;
   std::string substring;
   std::vector<int> indecies;
-  int v, t, n; // vertex, texture, normal
   stream >> substring;
 
   while (stream) {
     stream >> substring;
     indecies = split<int>(substring, '/');
-    formation.emplace_back(Point(indecies[0], indecies[1], indecies[2]));
+    formation.emplace_back(Face(indecies[0], indecies[1], indecies[2]));
   }
 
   return formation;
 }
+
+
 
 /**
  * Default constructor which reads a specified .obj file
@@ -100,11 +114,11 @@ void Mesh::readFromFile(const char* filename, float scale) {
     while (getline(file, line)) {
       if (line[0] == 'v') {
         if (line[1] == 't') {
-          textures.emplace_back(readPoint(line));
+          textures.emplace_back(readVertex(line));
         } else if (line[1] == 'n') {
-          normals.emplace_back(readPoint(line));
+          normals.emplace_back(readVertex(line));
         } else if (line[1] == ' ') {
-          vertices.emplace_back(readPoint(line));
+          vertices.emplace_back(readVertex(line));
         }
       } else if (line[0] == 'f') {
         faces.emplace_back(readFace(line));
@@ -113,6 +127,22 @@ void Mesh::readFromFile(const char* filename, float scale) {
     file.close();
   }
 }
+
+/**
+ * Updates the scale of the current mesh
+ * @param scale The adjusted scale factor for the mesh
+*/
+void Mesh::updateScale(float scale) { 
+  scaleFactor = scale; 
+};
+
+/**
+ * Returns a vector of 3D positional vectors representing the vertices of the mesh
+ * @return A vector of all 3D vertices comprising the mesh
+*/
+std::vector<sf::Vector3f> Mesh::getVertices() { 
+  return vertices; 
+};
 
 /**
  * Projects all vertices from 3D to 2D with a set position and rotation

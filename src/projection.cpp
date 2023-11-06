@@ -1,15 +1,72 @@
+/**
+ * Provides functionality for 3D camera and projection logic
+ * @author Lachlan Charteris
+*/
 
 #include <vector>
 #include <cmath>
 
 #include <SFML/Graphics.hpp>
 
-#include "Mesh.hpp"
+#include "Projection.hpp"
+
+/**
+ * Default empty constructor for Camera object
+*/
+Camera::Camera() { };
+
+/**
+ * Translates the Camera by a given 3D velocity vector
+ * @param velocity The 3D floating-point velocity to be applied to the camera
+*/
+void Camera::moveCamera(sf::Vector3f velocity) { 
+  position += velocity; 
+};
+
+/**
+ * Rotates the camera by a given 3D rotation vector
+ * @param rotation The 3D floating-point rotation vector to be applied to the camera
+*/
+void Camera::rotateCamera(sf::Vector3f rotation) { 
+  orientation += rotation; 
+};
+
+/**
+ * Returns a copy of the Cameras position vector
+ * @return The floating-point 3D position vector of the Camera
+*/
+sf::Vector3f Camera::getPosition() { 
+  return position; 
+};
+
+/**
+ * Returns a copy of the Cameras rotation vector
+ * @return The floating-point 3D rotation vector of the Camera
+*/
+sf::Vector3f Camera::getOrientation() { 
+  return orientation; 
+};
+
+
+
+/**
+ * Default empty constructor for matrix object
+*/
+Matrix::Matrix() { };
+
+/**
+ * Matrix object constructor from defined matrix rows
+ * @param a The first matrix row
+ * @param b The second matrix row
+ * @param c The third matrix row
+*/
+Matrix::Matrix(sf::Vector3f a, sf::Vector3f b, sf::Vector3f c) : A(a), B(b), C(c) { };
 
 /**
  * Computes the matrix multiplication between two 3x3 matrices
  * @param other The rvalue matrix being multiplied against
  * @return The resultant matrix
+ * @overload
 */
 Matrix Matrix::operator*(const Matrix &other) {
   return Matrix(
@@ -35,6 +92,7 @@ Matrix Matrix::operator*(const Matrix &other) {
  * Computes the matrix multiplication between 3x3 and 1x3 matrices
  * @param other The rvalue column vector being multiplied against
  * @return The resultant column vector
+ * @overload
 */
 sf::Vector3f Matrix::operator*(const sf::Vector3f &other) {
   return sf::Vector3f(

@@ -1,9 +1,65 @@
+/**
+ * Provides functionality for additional entities which can be used in the entity manager
+ * @author Lachlan Charteris
+*/
 
 #include <math.h>
 
 #include <SFML/Graphics.hpp>
 
 #include "Entities.hpp"
+#include "Projection.hpp"
+
+/**
+ * Constructor from drawable
+ * @param id The identifier for the new graphical entity
+ * @param g The drawable object
+*/
+template <typename S>
+GraphicalEntity<S>::GraphicalEntity(std::string id, S g) {
+  name = id;
+  position = g.getPosition();
+  scale = g.getScale();
+  bounds = g.getLocalBounds();
+}
+
+/**
+ * Constructor from position and drawable
+ * @param id The identifier for the new graphical entity
+ * @param g The drawable object
+ * @param pos The 2D position vector
+*/
+template <typename S>
+GraphicalEntity<S>::GraphicalEntity(std::string id, S g, sf::Vector2f pos) {
+  g.setPosition(pos);
+  GraphicalEntity<S>(id, g);
+}
+
+/**
+ * Updates the position of the entity and its graphic and regenerates bounds
+ * @param newPos The new position of the entity
+*/
+template <typename S>
+void GraphicalEntity<S>::setPosition(sf::Vector2f newPos) {
+  position = newPos;
+  bounds = sf::FloatRect(newPos + scale / 2.f, scale);
+  graphic.setPosition(newPos);
+}
+
+/**
+ * Renders the graphical entity
+ * @param window The render window
+*/
+template <typename S>
+void GraphicalEntity<S>::render(sf::RenderWindow &window) { 
+  window.draw(graphic); 
+};
+
+template class GraphicalEntity<sf::Sprite>;
+template class GraphicalEntity<sf::CircleShape>;
+template class GraphicalEntity<sf::RectangleShape>;
+
+
 
 /**
  * Default constructor to assign an id and load .obj file into Mesh object

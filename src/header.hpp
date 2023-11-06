@@ -1,6 +1,11 @@
 #ifndef HEADER
 #define HEADER
 
+/**
+ * Provides a grouped header file containing all relevant templates and functionality
+ * @author Lachlan Charteris
+*/
+
 #include <unordered_map>
 #include <iostream>
 #include <cstdio>
@@ -13,9 +18,12 @@
 // Include classes
 #include "EntityManager.hpp"
 #include "Entities.hpp"
+#include "Buttons.hpp"
+#include "Projection.hpp"
 #include "Mesh.hpp"
 
 // Declare functions
-void manageEvents(sf::RenderWindow&, Camera&);
+void updateCameraByInput(Camera&, sf::Keyboard::Scancode);
+void manageEvents(sf::RenderWindow&, Camera&, EntityManager&);
 
 #endif

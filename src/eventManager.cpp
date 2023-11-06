@@ -1,16 +1,62 @@
+/**
+ * Provides functionality for handling input events
+ * @author Lachlan Charteris
+*/
 
 #include <math.h>
 
 #include <SFML/Graphics.hpp>
 
+#include "EntityManager.hpp"
+#include "Projection.hpp"
 #include "Mesh.hpp"
 
 #define _USE_MATH_DEFINES
 
-void manageEvents(sf::RenderWindow &window, Camera &camera) {
+/**
+ * Updates the camera position or rotation by the user input
+ * @param camera The camera instance to be updated
+ * @param keycode The keycode scanned from the input keyboard press
+*/
+void updateCameraByInput(Camera &camera, sf::Keyboard::Scancode keycode) {
+  float rotationFactor = M_PI / 180.0f;
+  if (keycode == sf::Keyboard::Scan::W) { // Move camera
+    camera.moveCamera(sf::Vector3f(0, 0, 0.1));
+  } else if (keycode == sf::Keyboard::Scan::S) {
+    camera.moveCamera(sf::Vector3f(0, 0, -0.1));
+  } else if (keycode == sf::Keyboard::Scan::D) {
+    camera.moveCamera(sf::Vector3f(2, 0, 0));
+  } else if (keycode == sf::Keyboard::Scan::A) {
+    camera.moveCamera(sf::Vector3f(-2, 0, 0));
+  } else if (keycode == sf::Keyboard::Scan::LShift) {
+    camera.moveCamera(sf::Vector3f(0, -2, 0));
+  } else if (keycode == sf::Keyboard::Scan::Space) {
+    camera.moveCamera(sf::Vector3f(0, 2, 0));
+
+  } else if (keycode == sf::Keyboard::Scan::Q) { // Rotate camera
+    camera.rotateCamera(sf::Vector3f(0, -rotationFactor, 0));
+  } else if (keycode == sf::Keyboard::Scan::E) {
+    camera.rotateCamera(sf::Vector3f(0, rotationFactor, 0));
+  } else if (keycode == sf::Keyboard::Scan::Z) {
+    camera.rotateCamera(sf::Vector3f(0, 0, -rotationFactor));
+  } else if (keycode == sf::Keyboard::Scan::C) {
+    camera.rotateCamera(sf::Vector3f(0, 0, rotationFactor));
+  } else if (keycode == sf::Keyboard::Scan::F) {
+    camera.rotateCamera(sf::Vector3f(-rotationFactor, 0, 0));
+  } else if (keycode == sf::Keyboard::Scan::R) {
+    camera.rotateCamera(sf::Vector3f(rotationFactor, 0, 0));
+  }
+}
+
+/**
+ * Handles user input events for the camera and entity manager
+ * @param window The SFML render window to plot on
+ * @param camera The camera instance to control
+ * @param manager The entity manager to control UI and entity components
+*/
+void manageEvents(sf::RenderWindow &window, Camera &camera, EntityManager &manager) {
   sf::Event event;
   int width, height;
-  float rotationFactor = M_PI / 180.0f;
   while (window.pollEvent(event))
   {
     switch (event.type) {
@@ -21,30 +67,7 @@ void manageEvents(sf::RenderWindow &window, Camera &camera) {
       case sf::Event::KeyPressed:
         if (event.key.scancode == sf::Keyboard::Scan::Escape) // Exit
           window.close();
-        else if (event.key.scancode == sf::Keyboard::Scan::W) // Move camera
-          camera.moveCamera(sf::Vector3f(0, 0, 0.1));
-        else if (event.key.scancode == sf::Keyboard::Scan::S)
-          camera.moveCamera(sf::Vector3f(0, 0, -0.1));
-        else if (event.key.scancode == sf::Keyboard::Scan::D)
-          camera.moveCamera(sf::Vector3f(2, 0, 0));
-        else if (event.key.scancode == sf::Keyboard::Scan::A)
-          camera.moveCamera(sf::Vector3f(-2, 0, 0));
-        else if (event.key.scancode == sf::Keyboard::Scan::LShift)
-          camera.moveCamera(sf::Vector3f(0, -2, 0));
-        else if (event.key.scancode == sf::Keyboard::Scan::Space)
-          camera.moveCamera(sf::Vector3f(0, 2, 0));
-        else if (event.key.scancode == sf::Keyboard::Scan::Q) // Rotate camera
-          camera.rotateCamera(sf::Vector3f(0, -rotationFactor, 0));
-        else if (event.key.scancode == sf::Keyboard::Scan::E)
-          camera.rotateCamera(sf::Vector3f(0, rotationFactor, 0));
-        else if (event.key.scancode == sf::Keyboard::Scan::Z)
-          camera.rotateCamera(sf::Vector3f(0, 0, -rotationFactor));
-        else if (event.key.scancode == sf::Keyboard::Scan::C)
-          camera.rotateCamera(sf::Vector3f(0, 0, rotationFactor));
-        else if (event.key.scancode == sf::Keyboard::Scan::F)
-          camera.rotateCamera(sf::Vector3f(-rotationFactor, 0, 0));
-        else if (event.key.scancode == sf::Keyboard::Scan::R)
-          camera.rotateCamera(sf::Vector3f(rotationFactor, 0, 0));
+        updateCameraByInput(camera, event.key.scancode);
         break;
 
       case sf::Event::Resized:
@@ -80,10 +103,11 @@ void manageEvents(sf::RenderWindow &window, Camera &camera) {
 
       case sf::Event::MouseButtonPressed:
         if (event.mouseButton.button == sf::Mouse::Right)
-          std::cout << "Mouse Pressed At: (" << event.mouseButton.x << ", " << event.mouseButton.y << ")" << std::endl;
+          manager.interact();
         break;
 
       case sf::Event::MouseMoved:
+        manager.checkMousePosition(sf::Mouse::getPosition(window));
         break;
 
       case sf::Event::JoystickMoved:
