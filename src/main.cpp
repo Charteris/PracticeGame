@@ -80,8 +80,8 @@ int main()
   );
   std::shared_ptr<Input> input = entityManager.addUIElement<Input>(
     "input",
-    [](std::string input) { return true; },
-    sf::Vector2f(WIDTH - 150, HEIGHT / 8 + 150)
+    [](std::string input) { return input == "hello" ? "Test Error Tooltip" : ""; },
+    sf::Vector2f(WIDTH - 150, HEIGHT / 8 + 100)
   );
 
   // entityManager.addFromFile("res/simpleScene.png");

@@ -129,7 +129,7 @@ void Button::troubleshoot() {
 */
 Input::Input(
   std::string id, 
-  std::function<bool(std::string)> callback, 
+  std::function<std::string(std::string)> callback, 
   sf::Vector2f pos, 
   sf::Vector2f s
 ) {
@@ -169,6 +169,14 @@ void Input::instantiateInput(sf::Vector2f origin, sf::Vector2f s) {
   sf::Vector2f offset = origin 
     + sf::Vector2f(0.1f * s.x, s.y / 2.f - textSize / 2.f);
   displayText.setPosition(offset);
+  
+  // Instantiate error string text
+  errorBg = sf::RectangleShape();
+  errorText.setFont(font);
+  errorText.setFillColor(sf::Color::Black);
+  errorText.setString(errorString);
+  errorText.setCharacterSize(10);
+  errorText.setStyle(sf::Text::Italic);
 
   // Instantiate Caret (input cursor)
   caret[0].position = origin + sf::Vector2f(0.1f * s.x, 0.2f * s.y);
@@ -189,8 +197,23 @@ void Input::updateCaret() {
 void Input::onMouseHover() {
   if (isFocussed) graphic.setTexture(active);
   else if (isMouseInBounds) graphic.setTexture(hovered);
-  else graphic.setTexture(isErroneous ? error : idle);
+  else graphic.setTexture(errorString.empty() ? idle : error);
 };
+
+/**
+ * A helper function to be called whenever the blur event is invoked
+*/
+void Input::onBlur() {
+  errorString = onBlurCallback(input);
+  if (errorString.empty()) {
+    displayText.setFillColor(sf::Color(240, 240, 240));
+    
+  } else {
+    displayText.setFillColor(sf::Color(100, 0, 0));
+    errorText.setString(errorString);
+    errorBg.setSize(errorText.getLocalBounds().getSize() + sf::Vector2f(2.f, 2.f));
+  }
+}
 
 /**
  * Focus or unfocus the input field
@@ -199,12 +222,7 @@ void Input::onMouseHover() {
 */
 void Input::interact(sf::Mouse::Button mouseEvent, bool isMouseReleased) {
   if (mouseEvent == sf::Mouse::Left) {
-    if (isFocussed && !isMouseInBounds) { // Blur event
-      isErroneous = onBlurCallback(input);
-      displayText.setFillColor(
-        isErroneous ? sf::Color(100, 0, 0) : sf::Color(240, 240, 240)
-      );
-    }
+    if (isFocussed && !isMouseInBounds) onBlur();
     isFocussed = isMouseInBounds;
     onMouseHover();
   } 
@@ -218,8 +236,7 @@ void Input::applyKeyInput(int inputKey) {
   if (inputKey == ENTER) {
     // Unfocus from input field
     isFocussed = false;
-    isErroneous = onBlurCallback(input);
-    displayText.setFillColor(isErroneous ? sf::Color(100, 0, 0) : sf::Color(240, 240, 240));
+    onBlur();
     onMouseHover();
 
   } else if (inputKey == BACKSPACE) {
@@ -241,11 +258,21 @@ void Input::applyKeyInput(int inputKey) {
 void Input::render(sf::RenderWindow &window) {
   window.draw(graphic);
   window.draw(displayText);
+
   // Display Caret when active
   if (isFocussed) {
     double elapsedTime = clock.getElapsedTime().asSeconds();
     if (elapsedTime >= 0.4) window.draw(caret, 2, sf::Lines);
     if (elapsedTime >= 0.8) clock.restart();
+  }
+
+  // Display error tooltip when hovered and erroneous
+  if (!errorString.empty() && isMouseInBounds) {
+    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+    errorText.setPosition(mousePos.x + 1, mousePos.y + 1 - 12);
+    errorBg.setPosition(mousePos.x, mousePos.y - 10);
+    window.draw(errorBg);
+    window.draw(errorText);
   }
 }
 

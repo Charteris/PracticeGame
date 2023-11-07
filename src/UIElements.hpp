@@ -49,30 +49,29 @@ class Button : public Entity {
 */
 class Input : public Entity {
   protected:
-    std::function<bool(std::string)> onBlurCallback = 
-      [](std::string input) { 
-        std::cout << "No callback provided!" << std::endl;
-        return false;
-      };
+    std::function<std::string(std::string)> onBlurCallback = 
+      [](std::string input) { return "No callback provided!"; };
     sf::Font font;
-    sf::Text displayText;
+    sf::Text displayText, errorText;
+    sf::RectangleShape errorBg;
     sf::Texture idle, hovered, active, error;
     sf::Sprite graphic;
     sf::Vertex caret[2];
     sf::Clock clock;
-    std::string input = "";
-    bool isFocussed = false, isErroneous = false;
+    std::string input = "", errorString = "";
+    bool isFocussed = false;
   
   public:
     Input(
       std::string,
-      std::function<bool(std::string)>, 
+      std::function<std::string(std::string)>, 
       sf::Vector2f pos = sf::Vector2f(),
-      sf::Vector2f s = sf::Vector2f(128.f, 48.f)
+      sf::Vector2f s = sf::Vector2f(128.f, 32.f)
     );
     void instantiateInput(sf::Vector2f, sf::Vector2f);
     void updateCaret();
     void onMouseHover();
+    void onBlur();
     void interact(sf::Mouse::Button, bool isMouseReleased = false);
     void applyKeyInput(int);
     void render(sf::RenderWindow&);
