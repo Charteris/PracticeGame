@@ -18,8 +18,8 @@
 class Entity {
   protected:
     std::string name = "id";
-    sf::Vector2f position = sf::Vector2f(0, 0);
-    sf::Vector2f scale = sf::Vector2f(1, 1);
+    sf::Vector2f position = sf::Vector2f(0, 0), scale = sf::Vector2f(1, 1);
+    sf::Vector2f scaleFactor = sf::Vector2f(1, 1);
     sf::FloatRect bounds = sf::FloatRect(0, 0, 1, 1);
     bool isMouseInBounds = false;
     
@@ -40,6 +40,7 @@ class Entity {
     virtual void setScale(sf::Vector2f);
     virtual void onMouseHover();
     virtual void interact(sf::Mouse::Button, bool isMouseReleased = false);
+    virtual void applyKeyInput(int);
     virtual void update();
     virtual void render(sf::RenderWindow&);
     virtual void troubleshoot();
@@ -68,6 +69,7 @@ class EntityManager {
     int size();
     void checkMousePosition(sf::Vector2i);
     void interact(sf::Mouse::Button, bool isMouseReleased = false);
+    void applyKeyInput(int);
     void update();
     void render(sf::RenderWindow&);
     void addFromFile(const char*, float pixelSize=32, sf::Vector2f offset=sf::Vector2f(0, 0));

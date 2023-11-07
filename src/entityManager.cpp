@@ -55,7 +55,6 @@ Entity::Entity(std::string id, sf::Vector2f pos, sf::Vector2f s)
 void Entity::checkMousePosition(sf::Vector2i mousePos) {
   bool mouseInBounds = contains(mousePos);
   if (mouseInBounds != isMouseInBounds) {
-    std::cout << "Updating mouse hover" << std::endl;
     isMouseInBounds = mouseInBounds;
     onMouseHover();
   }
@@ -150,10 +149,18 @@ void Entity::onMouseHover() {
 
 /**
  * Allows the user to interact with the entity through the render window
+ * @param mouseEvent The mouse event invoking the interaction
+ * @param isMouseReleased Whether the mouse was released or not @def{false}
 */
 void Entity::interact(sf::Mouse::Button mouseEvent, bool isMouseReleased) { 
   std::cout << "Interacted with " << name << std::endl;
 };
+
+/**
+ * Provides functionality on key presses
+ * @param inputKey The integer unicode value for the input character
+*/
+void Entity::applyKeyInput(int inputKey) { };
 
 /**
  * Updates the current entity
@@ -162,6 +169,7 @@ void Entity::update() { };
 
 /**
  * Renders the current entity on the appropriate render window
+ * @param window The SFML Render window to render on
 */
 void Entity::render(sf::RenderWindow &window) { };
 
@@ -246,12 +254,25 @@ void EntityManager::checkMousePosition(sf::Vector2i mousePos) {
 
 /**
  * Interacts with applicable entities in the manager
+ * @param mouseEvent The mouse event invoking the interaction
+ * @param isMouseReleased Whether the mouse event was released @def{false}
 */
 void EntityManager::interact(sf::Mouse::Button mouseEvent, bool isMouseReleased) {
   for (auto it = entities.begin(); it != entities.end(); it++) 
     it->second->interact(mouseEvent, isMouseReleased); 
   for (auto it = uiElements.begin(); it != uiElements.end(); it++) 
     it->second->interact(mouseEvent, isMouseReleased); 
+};
+
+/**
+ * Provides functionality on key presses for all entities in the manager
+ * @param inputKey The integer unicode value for the input character
+*/
+void EntityManager::applyKeyInput(int inputKey) { 
+  for (auto it = entities.begin(); it != entities.end(); it++) 
+    it->second->applyKeyInput(inputKey); 
+  for (auto it = uiElements.begin(); it != uiElements.end(); it++) 
+    it->second->applyKeyInput(inputKey); 
 };
 
 /**

@@ -57,8 +57,7 @@ void updateCameraByInput(Camera &camera, sf::Keyboard::Scancode keycode) {
 void manageEvents(sf::RenderWindow &window, Camera &camera, EntityManager &manager) {
   sf::Event event;
   int width, height;
-  while (window.pollEvent(event))
-  {
+  while (window.pollEvent(event)) {
     switch (event.type) {
       case sf::Event::Closed:
         window.close();
@@ -93,8 +92,7 @@ void manageEvents(sf::RenderWindow &window, Camera &camera, EntityManager &manag
         break;
 
       case sf::Event::TextEntered:
-        // if (event.text.unicode < 128)
-        //   std::cout << static_cast<char>(event.text.unicode);
+        manager.applyKeyInput(event.text.unicode);
         break;
 
       case sf::Event::MouseWheelScrolled:

@@ -12,14 +12,16 @@
 
 int main()
 {
-  // Simple circle rendering
+  // Define render window
   const int WIDTH = 1280, HEIGHT = 960;
   sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "SFML App");
-  sf::Color bgColor = sf::Color(sf::Color::White);
+  sf::Color bgColor = sf::Color(sf::Color(10, 10, 10));
+
+  // Simple circle shape object
   sf::CircleShape shape(100.f);
   shape.setFillColor(sf::Color::Green);
 
-  // Create texture
+  // Create sprite with texture
   sf::Texture texture;
   texture.loadFromFile("res/Tile.png");
   texture.setRepeated(true);
@@ -37,7 +39,7 @@ int main()
 
   sf::Text text;
   text.setFont(font);
-  text.setFillColor(sf::Color::Black);
+  text.setFillColor(sf::Color(200, 200, 200));
   text.setString(buffer);
   text.setCharacterSize(textSize);
   text.setStyle(sf::Text::Bold);
@@ -74,8 +76,12 @@ int main()
     "button", 
     "Test Button", 
     []() { std::cout << "Button callback" << std::endl; },
-    sf::Vector2f(WIDTH - 150, HEIGHT / 8), 
-    sf::Vector2f(100, 30)
+    sf::Vector2f(WIDTH - 150, HEIGHT / 8)
+  );
+  std::shared_ptr<Input> input = entityManager.addUIElement<Input>(
+    "input",
+    [](std::string input) { return true; },
+    sf::Vector2f(WIDTH - 150, HEIGHT / 8 + 150)
   );
 
   // entityManager.addFromFile("res/simpleScene.png");

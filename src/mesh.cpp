@@ -180,7 +180,7 @@ std::vector<sf::CircleShape> Mesh::renderVertices(
   sf::IntRect viewport = window.getViewport(window.getView());
 
   sf::CircleShape tempShape(2);
-  tempShape.setFillColor(sf::Color::Black);
+  tempShape.setFillColor(sf::Color(240, 240, 240));
 
   for (auto vertex : projectedVertices) {
     if (viewport.contains(vertex.x, vertex.y)) {
@@ -209,7 +209,7 @@ std::vector<sf::VertexArray> Mesh::renderEdges(
     vertices.resize(face.size());
     for (int index = 0; index < face.size(); index++) {
       vertices[index].position = projectedVertices.at( face[index].vertex - 1 );
-      vertices[index].color = sf::Color::Black;
+      vertices[index].color = sf::Color(240, 240, 240);
     }
 
     if (vertices.getBounds().intersects(viewport))
@@ -233,8 +233,8 @@ std::vector<sf::ConvexShape> Mesh::renderFaces(
   sf::FloatRect viewport(window.getViewport(window.getView()));
 
   sf::ConvexShape tempShape;
-  tempShape.setFillColor(sf::Color(100, 100, 100, 50)); // Transparent grey
-  tempShape.setOutlineColor(sf::Color::Black);
+  tempShape.setFillColor(sf::Color(200, 200, 200, 50)); // Transparent grey
+  tempShape.setOutlineColor(sf::Color(240, 240, 240));
 
   // TODO: Remove faces rendering behind other faces
   for (auto face : faces) {
