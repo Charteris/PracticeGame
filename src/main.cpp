@@ -7,7 +7,6 @@
 #include <math.h>
 
 #include "Header.hpp"
-#include "Buttons.hpp"
 
 #define _USE_MATH_DEFINES
 
@@ -71,12 +70,13 @@ int main()
   );
 
   // Add UI Entities
-  std::shared_ptr<Button<sf::RectangleShape>> button = 
-    entityManager.addUIElement<Button<sf::RectangleShape>>(
-      "button", sf::Vector2f(WIDTH - 100, HEIGHT / 8), sf::Vector2f(100, 100), []() { 
-        std::cout << "Button Callback" << std::endl;
-      }
-    );
+  std::shared_ptr<Button> button = entityManager.addUIElement<Button>(
+    "button", 
+    "Test Button", 
+    []() { std::cout << "Button callback" << std::endl; },
+    sf::Vector2f(WIDTH - 150, HEIGHT / 8), 
+    sf::Vector2f(100, 30)
+  );
 
   // entityManager.addFromFile("res/simpleScene.png");
   // std::cout << "Length: " << entityManager.size() << std::endl;
@@ -110,13 +110,12 @@ int main()
 
     window.display();
 
-    // Continuous troubleshooting
+    // Provide troubleshooting information
     ++frames;
     // if (clock.getElapsedTime().asSeconds() >= 1) { 
     //   std::cout << "FPS: " << frames << std::endl;
     //   clock.restart();
     //   frames = 0;
-    //   button->troubleshoot();
     // }
   }
 

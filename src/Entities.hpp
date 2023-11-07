@@ -28,6 +28,7 @@ class GraphicalEntity : public Entity {
     GraphicalEntity(std::string, S, sf::Vector2f);
     void setPosition(sf::Vector2f);
     void render(sf::RenderWindow&);
+    void troubleshoot();
 };
 
 /**
@@ -44,6 +45,7 @@ class MeshEntity : public Entity {
     MeshEntity(std::string, sf::Vector3f, Camera*, const char*, float scale=50);
     void rotate(sf::Vector3f rot) { rotation += rot; };
     void render(sf::RenderWindow&);
+    void troubleshoot();
 };
 
 #endif

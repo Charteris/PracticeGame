@@ -102,8 +102,11 @@ void manageEvents(sf::RenderWindow &window, Camera &camera, EntityManager &manag
         break;
 
       case sf::Event::MouseButtonPressed:
-        if (event.mouseButton.button == sf::Mouse::Right)
-          manager.interact();
+        manager.interact(event.mouseButton.button);
+        break;
+
+      case sf::Event::MouseButtonReleased:
+        manager.interact(event.mouseButton.button, true);
         break;
 
       case sf::Event::MouseMoved:

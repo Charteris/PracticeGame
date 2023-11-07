@@ -151,7 +151,7 @@ void Entity::onMouseHover() {
 /**
  * Allows the user to interact with the entity through the render window
 */
-void Entity::interact() { 
+void Entity::interact(sf::Mouse::Button mouseEvent, bool isMouseReleased) { 
   std::cout << "Interacted with " << name << std::endl;
 };
 
@@ -164,6 +164,14 @@ void Entity::update() { };
  * Renders the current entity on the appropriate render window
 */
 void Entity::render(sf::RenderWindow &window) { };
+
+/**
+ * Displays troubleshooting information through the console
+*/
+void Entity::troubleshoot() { 
+  std::cout << name << ": " << position.x << " " << position.y << " | "
+    << scale.x << " " << scale.y << std::endl;
+};
 
 
 
@@ -239,11 +247,11 @@ void EntityManager::checkMousePosition(sf::Vector2i mousePos) {
 /**
  * Interacts with applicable entities in the manager
 */
-void EntityManager::interact() {
+void EntityManager::interact(sf::Mouse::Button mouseEvent, bool isMouseReleased) {
   for (auto it = entities.begin(); it != entities.end(); it++) 
-    it->second->interact(); 
+    it->second->interact(mouseEvent, isMouseReleased); 
   for (auto it = uiElements.begin(); it != uiElements.end(); it++) 
-    it->second->interact(); 
+    it->second->interact(mouseEvent, isMouseReleased); 
 };
 
 /**

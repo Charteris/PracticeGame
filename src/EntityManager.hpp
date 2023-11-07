@@ -39,9 +39,10 @@ class Entity {
     virtual void setPosition(sf::Vector2f);
     virtual void setScale(sf::Vector2f);
     virtual void onMouseHover();
-    virtual void interact();
+    virtual void interact(sf::Mouse::Button, bool isMouseReleased = false);
     virtual void update();
     virtual void render(sf::RenderWindow&);
+    virtual void troubleshoot();
 };
 
 /**
@@ -57,7 +58,6 @@ class EntityManager {
     std::shared_ptr<Derived> addEntity(std::string, Args&&...);
     template <typename Derived = Entity, typename... Args> 
     std::shared_ptr<Derived> addUIElement(std::string, Args&&...);
-    
     void definePlayer(std::string key) { playerKey = key; };
     std::shared_ptr<Entity> getPlayer();
     std::shared_ptr<Entity> getEntity(std::string);
@@ -66,9 +66,8 @@ class EntityManager {
     void removeEntity(std::string);
     void removeUIElement(std::string);
     int size();
-
     void checkMousePosition(sf::Vector2i);
-    void interact();
+    void interact(sf::Mouse::Button, bool isMouseReleased = false);
     void update();
     void render(sf::RenderWindow&);
     void addFromFile(const char*, float pixelSize=32, sf::Vector2f offset=sf::Vector2f(0, 0));

@@ -3,7 +3,9 @@
  * @author Lachlan Charteris
 */
 
+#include <iostream>
 #include <math.h>
+#include <typeinfo>
 
 #include <SFML/Graphics.hpp>
 
@@ -12,6 +14,7 @@
 
 /**
  * Constructor from drawable
+ * @tparam S The type of graphic stored within the GraphicalEntity @def{sf::Sprite}
  * @param id The identifier for the new graphical entity
  * @param g The drawable object
 */
@@ -25,6 +28,7 @@ GraphicalEntity<S>::GraphicalEntity(std::string id, S g) {
 
 /**
  * Constructor from position and drawable
+ * @tparam S The type of graphic stored within the GraphicalEntity @def{sf::Sprite}
  * @param id The identifier for the new graphical entity
  * @param g The drawable object
  * @param pos The 2D position vector
@@ -53,6 +57,15 @@ void GraphicalEntity<S>::setPosition(sf::Vector2f newPos) {
 template <typename S>
 void GraphicalEntity<S>::render(sf::RenderWindow &window) { 
   window.draw(graphic); 
+};
+
+/**
+ * Displays troubleshooting information through the console
+*/
+template <typename S>
+void GraphicalEntity<S>::troubleshoot() { 
+  std::cout << name << ": " << typeid(S).name() << " | " << position.x << " " << position.y << " | "
+    << scale.x << " " << scale.y << std::endl;
 };
 
 template class GraphicalEntity<sf::Sprite>;
@@ -112,3 +125,11 @@ void MeshEntity::render(sf::RenderWindow &window) {
     window.draw(vertex);
   }
 }
+
+/**
+ * Displays troubleshooting information through the console
+*/
+void MeshEntity::troubleshoot() { 
+  std::cout << name << ": " << position3D.x << " " << position3D.y << " " << position3D.z << " | "
+    << rotation.x << " " << rotation.y << " " << rotation.z << std::endl;
+};
