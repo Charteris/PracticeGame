@@ -33,18 +33,20 @@ class Mesh {
     std::vector<sf::Vector3f> normals;
     // Faces define the points and normal vector comprising a face
     std::vector<std::vector<Face>> faces;
-    float scaleFactor = 1;
     
   public:
     Mesh() { };
     Mesh(const char*);
-    void readFromFile(const char*, float scale=1);
-    void updateScale(float);
+    void readFromFile(const char*);
     std::vector<sf::Vector3f> getVertices();
-    std::vector<sf::Vector2f> projectVertices(const sf::Vector3f&, const sf::Vector3f&);
-    std::vector<sf::CircleShape> renderVertices(sf::RenderWindow&, std::vector<sf::Vector2f>&);
-    std::vector<sf::VertexArray> renderEdges(sf::RenderWindow&, std::vector<sf::Vector2f>&);
-    std::vector<sf::ConvexShape> renderFaces(sf::RenderWindow&, std::vector<sf::Vector2f>&);
+    std::vector<sf::Vector2f> getProjectedVertices(
+      const sf::Vector3f&, 
+      const sf::Vector3f&, 
+      float scaleFactor = 1.f
+    );
+    std::vector<sf::CircleShape> getRenderVertices(sf::RenderWindow&, std::vector<sf::Vector2f>&);
+    std::vector<sf::VertexArray> getRenderEdges(sf::RenderWindow&, std::vector<sf::Vector2f>&);
+    std::vector<sf::ConvexShape> getRenderFaces(sf::RenderWindow&, std::vector<sf::Vector2f>&);
 };
 
 #endif

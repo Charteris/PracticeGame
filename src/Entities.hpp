@@ -40,9 +40,10 @@ class MeshEntity : public Entity {
     sf::Vector3f position3D;
     sf::Vector3f rotation;
     Camera *camera;
+    float scaleFactor = 50;
 
   public:
-    MeshEntity(std::string, sf::Vector3f, Camera*, const char*, float scale=50);
+    MeshEntity(std::string, sf::Vector3f, Camera*, Mesh&, float scale=50);
     void rotate(sf::Vector3f rot) { rotation += rot; };
     void render(sf::RenderWindow&);
     void troubleshoot();

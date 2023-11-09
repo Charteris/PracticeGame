@@ -15,15 +15,21 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-// Include classes
+// Include Classes
+#include "Resources.hpp"
 #include "EntityManager.hpp"
 #include "Entities.hpp"
 #include "UIElements.hpp"
 #include "Projection.hpp"
 #include "Mesh.hpp"
 
-// Declare functions
+// Event Manager Functions
 void updateCameraByInput(Camera&, sf::Keyboard::Scancode);
 void manageEvents(sf::RenderWindow&, Camera&, EntityManager&);
+
+// Input Validation Functions
+std::string validateEquationLogic(std::string);
+std::string validateNumeric(std::string);
+std::string validateBrackets(std::string);
 
 #endif

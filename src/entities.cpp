@@ -79,17 +79,18 @@ template class GraphicalEntity<sf::RectangleShape>;
  * @param id The unique id for the entity
  * @param pos The 3D position of the new entity
  * @param camera A reference to the camera object for orthographic projection
- * @param objFile The name of the .obj file
+ * @param objMesh A reference to the mesh object preloaded in resources
  * @param scale The scale factor for the resultant mesh @def{50}
 */
 MeshEntity::MeshEntity(
-  std::string id, sf::Vector3f pos, Camera *cam, const char *objFile, float scale
+  std::string id, sf::Vector3f pos, Camera *cam, Mesh &objMesh, float scale
 ) {
   name = id;
   position3D = pos;
   position = sf::Vector2f(pos.x, pos.y);
   camera = cam;
-  mesh.readFromFile(objFile, scale);
+  mesh = objMesh;
+  scaleFactor = scale;
 }
 
 /**
@@ -102,10 +103,12 @@ void MeshEntity::render(sf::RenderWindow &window) {
   // TODO: Only add by camera angle and position if the object is selected
   sf::Vector3f relativePos = position3D - camPos;
   sf::Vector3f viewAngle = rotation - camAngle;
-  std::vector<sf::Vector2f> projectedVertices = mesh.projectVertices(relativePos, viewAngle);
+  std::vector<sf::Vector2f> projectedVertices = mesh.getProjectedVertices(
+    relativePos, viewAngle, scaleFactor
+  );
 
   // Only render vertices which are within the window bounds
-  std::vector<sf::ConvexShape> faces = mesh.renderFaces(window, projectedVertices);
+  std::vector<sf::ConvexShape> faces = mesh.getRenderFaces(window, projectedVertices);
   for (auto face : faces) {
     // Could be used for displaying edges but there are infinite perspective lines
     face.setOutlineThickness(0); 
@@ -113,13 +116,13 @@ void MeshEntity::render(sf::RenderWindow &window) {
   }
 
   // Renders the edges of each face
-  std::vector<sf::VertexArray> edges = mesh.renderEdges(window, projectedVertices);
+  std::vector<sf::VertexArray> edges = mesh.getRenderEdges(window, projectedVertices);
   for (auto edge : edges) {
     window.draw(edge);
   }
 
   // Renders the points for each vertex
-  std::vector<sf::CircleShape> vertices = mesh.renderVertices(window, projectedVertices);
+  std::vector<sf::CircleShape> vertices = mesh.getRenderVertices(window, projectedVertices);
   for (auto vertex : vertices) {
     vertex.setScale(1 / relativePos.z, 1 / relativePos.z);
     window.draw(vertex);

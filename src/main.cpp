@@ -1,5 +1,5 @@
 /**
- * The main execution script for the Radar Simulator project
+ * The main testing script for the game engine
  * @author Lachlan Charteris
 */
 
@@ -12,10 +12,12 @@
 
 int main()
 {
+  std::cout << "Loading Resources..." << std::endl;
+
   // Define render window
   const int WIDTH = 1280, HEIGHT = 960;
   sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "SFML App");
-  sf::Color bgColor = sf::Color(sf::Color(10, 10, 10));
+  sf::Color bgColor = resources::ColorMap["BACKGROUND"];
 
   // Simple circle shape object
   sf::CircleShape shape(100.f);
@@ -39,7 +41,7 @@ int main()
 
   sf::Text text;
   text.setFont(font);
-  text.setFillColor(sf::Color(200, 200, 200));
+  text.setFillColor(resources::ColorMap["TEXT"]);
   text.setString(buffer);
   text.setCharacterSize(textSize);
   text.setStyle(sf::Text::Bold);
@@ -68,7 +70,7 @@ int main()
   long long int counter = 1;
   float step = M_PI / 4280;
   std::shared_ptr<MeshEntity> entity = entityManager.addEntity<MeshEntity>(
-    "mesh", sf::Vector3f(WIDTH / 2, HEIGHT / 2, 1.f), &camera, "res/Person_model.obj"
+    "mesh", sf::Vector3f(WIDTH / 2, HEIGHT / 2, 1.f), &camera, resources::MeshMap["Test"]
   );
 
   // Add UI Entities
@@ -80,7 +82,7 @@ int main()
   );
   std::shared_ptr<Input> input = entityManager.addUIElement<Input>(
     "input",
-    [](std::string input) { return input == "hello" ? "Test Error Tooltip" : ""; },
+    &validateNumeric,
     sf::Vector2f(WIDTH - 150, HEIGHT / 8 + 100)
   );
 

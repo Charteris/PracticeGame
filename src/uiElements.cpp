@@ -12,6 +12,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "UIElements.hpp"
+#include "Resources.hpp"
 
 #define BACKSPACE 8
 #define ENTER 13
@@ -23,29 +24,17 @@
  * @param callback The callback to be called when interacted with
  * @param pos The position of the button on the render window @def{sf::Vector2f(0, 0)}
  * @param s The size of the button @def{sf::Vector2f(128, 64)}
- * @param idleTextureName The name of the idle button texture @def{res/Button.png}
- * @param hoveredTextureName 
- *          The name of the hovered button texture @def{res/ButtonHovered.png}
- * @param pressedTextureName 
- *          The name of the pressed button texture @def{res/ButtonPressed.png}
 */
 Button::Button(
   std::string id,
   std::string title, 
   std::function<void()> callback,
   sf::Vector2f pos, 
-  sf::Vector2f s, 
-  std::string idleTextureName,
-  std::string hoveredTextureName,
-  std::string pressedTextureName
+  sf::Vector2f s
 ) {
   instantiateButton(title, pos, s);
-  idle.loadFromFile(idleTextureName);
-  hovered.loadFromFile(hoveredTextureName);
-  pressed.loadFromFile(pressedTextureName);
-
-  sf::Vector2u textureSize = idle.getSize();
-  sf::Sprite sprite(idle);
+  sf::Vector2u textureSize = resources::TextureMap["BUTTON"].getSize();
+  sf::Sprite sprite(resources::TextureMap["BUTTON"]);
   sprite.setPosition(pos);
   sprite.setScale(sf::Vector2f(s.x / textureSize.x, s.y / textureSize.y));
 
@@ -65,15 +54,14 @@ Button::Button(
  * @param s The size of the button
 */
 void Button::instantiateButton(std::string title, sf::Vector2f origin, sf::Vector2f s) {
-  int textSize = 14;
-  font.loadFromFile("res/arial.ttf");
-  displayText.setFont(font);
-  displayText.setFillColor(sf::Color(240, 240, 240));
+  displayText.setFont(resources::ArialFont);
+  displayText.setFillColor(resources::ColorMap["TEXT"]);
   displayText.setString(title);
-  displayText.setCharacterSize(textSize);
+  displayText.setCharacterSize(resources::TextSize);
   displayText.setStyle(sf::Text::Bold);
-  sf::Vector2f offset = origin + s / 2.f 
-    - sf::Vector2f(textSize / 4.f * title.length(), textSize / 2.f);
+  sf::Vector2f offset = origin + s / 2.f - sf::Vector2f(
+      resources::TextSize / 4.f * title.length(), resources::TextSize / 2.f
+    );
   displayText.setPosition(offset);
 }
 
@@ -81,7 +69,11 @@ void Button::instantiateButton(std::string title, sf::Vector2f origin, sf::Vecto
  * Provides a callback function to be called when the mouse hovers over the button
 */
 void Button::onMouseHover() {
-  graphic.setTexture(isMouseInBounds ? hovered : idle);
+  graphic.setTexture(
+    isMouseInBounds 
+      ? resources::TextureMap["BUTTON_HOVERED"] 
+      : resources::TextureMap["BUTTON"]
+  );
 };
 
 /**
@@ -92,10 +84,10 @@ void Button::onMouseHover() {
 void Button::interact(sf::Mouse::Button mouseEvent, bool isMouseReleased) {
   if (mouseEvent == sf::Mouse::Left) {
     if (isMouseReleased) {
-      graphic.setTexture(idle);
+      graphic.setTexture(resources::TextureMap["BUTTON"]);
       if (isMouseInBounds) onClickCallback();
     } else if (isMouseInBounds) {
-      graphic.setTexture(pressed);
+      graphic.setTexture(resources::TextureMap["BUTTON_PRESSED"]);
     }
   } 
 }
@@ -134,13 +126,9 @@ Input::Input(
   sf::Vector2f s
 ) {
   instantiateInput(pos, s);
-  idle.loadFromFile("res/Input.png");
-  hovered.loadFromFile("res/InputHovered.png");
-  active.loadFromFile("res/InputActive.png");
-  error.loadFromFile("res/InputError.png");
 
-  sf::Vector2u textureSize = idle.getSize();
-  sf::Sprite sprite(idle);
+  sf::Vector2u textureSize = resources::TextureMap["INPUT"].getSize();
+  sf::Sprite sprite(resources::TextureMap["INPUT"]);
   sprite.setPosition(pos);
   sprite.setScale(sf::Vector2f(s.x / textureSize.x, s.y / textureSize.y));
 
@@ -159,33 +147,34 @@ Input::Input(
  * @param s The size of the button
 */
 void Input::instantiateInput(sf::Vector2f origin, sf::Vector2f s) {
-  int textSize = 14;
-  font.loadFromFile("res/arial.ttf");
-  displayText.setFont(font);
-  displayText.setFillColor(sf::Color(240, 240, 240));
+  displayText.setFont(resources::ArialFont);
+  displayText.setFillColor(resources::ColorMap["TEXT"]);
   displayText.setString(input);
-  displayText.setCharacterSize(textSize);
+  displayText.setCharacterSize(resources::TextSize);
   displayText.setStyle(sf::Text::Bold);
   sf::Vector2f offset = origin 
-    + sf::Vector2f(0.1f * s.x, s.y / 2.f - textSize / 2.f);
+    + sf::Vector2f(0.1f * s.x, s.y / 2.f - resources::TextSize / 2.f);
   displayText.setPosition(offset);
   
   // Instantiate error string text
   errorBg = sf::RectangleShape();
-  errorText.setFont(font);
-  errorText.setFillColor(sf::Color::Black);
+  errorText.setFont(resources::ArialFont);
+  errorText.setFillColor(resources::ColorMap["TOOLTIP"]);
   errorText.setString(errorString);
-  errorText.setCharacterSize(10);
+  errorText.setCharacterSize(resources::TooltipSize);
   errorText.setStyle(sf::Text::Italic);
 
   // Instantiate Caret (input cursor)
   caret[0].position = origin + sf::Vector2f(0.1f * s.x, 0.2f * s.y);
-  caret[0].color = sf::Color(200, 200, 200);
+  caret[0].color = resources::ColorMap["VERTICES"];
   caret[1].position = origin + sf::Vector2f(0.1f * s.x, 0.8f * s.y);
-  caret[1].color = sf::Color(200, 200, 200);
+  caret[1].color = resources::ColorMap["VERTICES"];
 }
 
-void Input::updateCaret() {
+/**
+ * Updates the position of the Caret cursor
+*/
+void Input::updateCaretPos() {
   float textWidth = displayText.getLocalBounds().width;
   caret[0].position = position + sf::Vector2f(0.1f * scale.x + textWidth, 0.2f * scale.y);
   caret[1].position = position + sf::Vector2f(0.1f * scale.x + textWidth, 0.8f * scale.y);
@@ -195,9 +184,13 @@ void Input::updateCaret() {
  * Provides a callback function to be called when the mouse hovers over the button
 */
 void Input::onMouseHover() {
-  if (isFocussed) graphic.setTexture(active);
-  else if (isMouseInBounds) graphic.setTexture(hovered);
-  else graphic.setTexture(errorString.empty() ? idle : error);
+  if (isFocussed) graphic.setTexture(resources::TextureMap["INPUT_ACTIVE"]);
+  else if (isMouseInBounds) graphic.setTexture(resources::TextureMap["INPUT_HOVERED"]);
+  else graphic.setTexture(
+    errorString.empty() 
+      ? resources::TextureMap["INPUT"] 
+      : resources::TextureMap["INPUT_ERROR"]
+  );
 };
 
 /**
@@ -206,10 +199,10 @@ void Input::onMouseHover() {
 void Input::onBlur() {
   errorString = onBlurCallback(input);
   if (errorString.empty()) {
-    displayText.setFillColor(sf::Color(240, 240, 240));
+    displayText.setFillColor(resources::ColorMap["TEXT"]);
     
   } else {
-    displayText.setFillColor(sf::Color(100, 0, 0));
+    displayText.setFillColor(resources::ColorMap["ERROR"]);
     errorText.setString(errorString);
     errorBg.setSize(errorText.getLocalBounds().getSize() + sf::Vector2f(2.f, 2.f));
   }
@@ -223,6 +216,10 @@ void Input::onBlur() {
 void Input::interact(sf::Mouse::Button mouseEvent, bool isMouseReleased) {
   if (mouseEvent == sf::Mouse::Left) {
     if (isFocussed && !isMouseInBounds) onBlur();
+    if (!isFocussed && isMouseInBounds) {
+      displayText.setFillColor(resources::ColorMap["TEXT"]);
+      caretIndex = input.length() - 1;
+    }
     isFocussed = isMouseInBounds;
     onMouseHover();
   } 
@@ -238,17 +235,18 @@ void Input::applyKeyInput(int inputKey) {
     isFocussed = false;
     onBlur();
     onMouseHover();
-
   } else if (inputKey == BACKSPACE) {
-    input.pop_back();
-
+    if (!input.empty()) {
+      input.pop_back();
+      caretIndex --;
+    }
   } else if (inputKey < 128) {
     char key = static_cast<char>(inputKey);
     input += key;
-
+    caretIndex ++;
   } else return;
   displayText.setString(input);
-  updateCaret();
+  updateCaretPos();
 }
 
 /**

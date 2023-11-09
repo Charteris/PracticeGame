@@ -38,7 +38,10 @@ std::string validateBrackets(std::string input) {
   std::string parenthesis = "";
   for (char c : input) {
     if (c == '(') parenthesis += c;
-    else if (c == ')') parenthesis.pop_back();
+    else if (c == ')') {
+      if (parenthesis.empty()) return "Too Many Trailing Brackets";
+      else parenthesis.pop_back();
+    }
   }
-  return parenthesis.empty() ? "" : "Brackets Must Match";
+  return parenthesis.empty() ? "" : "Too Many Leading Brackets";
 }

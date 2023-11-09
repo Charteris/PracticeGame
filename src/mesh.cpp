@@ -12,6 +12,7 @@
 
 #include "Mesh.hpp"
 #include "Projection.hpp"
+#include "Resources.hpp"
 
 /**
  * Default constructor for the Face structure
@@ -101,10 +102,8 @@ Mesh::Mesh(const char* filename) {
 /**
  * Interprets a .obj file and stores it in the Mesh object
  * @param filename The name of the .obj file being interpreted
- * @param scale The scale factor for the interpretted mesh @def{1}
 */
-void Mesh::readFromFile(const char* filename, float scale) {
-  scaleFactor = scale;
+void Mesh::readFromFile(const char* filename) {
   std::string line;
   std::ifstream file(filename);
 
@@ -129,14 +128,6 @@ void Mesh::readFromFile(const char* filename, float scale) {
 }
 
 /**
- * Updates the scale of the current mesh
- * @param scale The adjusted scale factor for the mesh
-*/
-void Mesh::updateScale(float scale) { 
-  scaleFactor = scale; 
-};
-
-/**
  * Returns a vector of 3D positional vectors representing the vertices of the mesh
  * @return A vector of all 3D vertices comprising the mesh
 */
@@ -148,10 +139,11 @@ std::vector<sf::Vector3f> Mesh::getVertices() {
  * Projects all vertices from 3D to 2D with a set position and rotation
  * @param position The relative position of the mesh to the view instance
  * @param rotation The relative rotation of the mesh to the view instance
+ * @param scaleFactor The factor with which to scale the vertices during projection @def{1}
  * @return A vector of all vertices projected to 2D space
 */
-std::vector<sf::Vector2f> Mesh::projectVertices(
-  const sf::Vector3f &position, const sf::Vector3f &rotation
+std::vector<sf::Vector2f> Mesh::getProjectedVertices(
+  const sf::Vector3f &position, const sf::Vector3f &rotation, float scaleFactor
 ) {
   std::vector<sf::Vector2f> projectedVertices;
   Matrix rotationMatrix = getRotationMatrix(rotation), projectedMatrix;
@@ -173,14 +165,14 @@ std::vector<sf::Vector2f> Mesh::projectVertices(
  * @param projectedVertices A vector of vertices projected from 3D to 2D space
  * @return A vector of SFML circle shapes to be rendered which are contained within the screen
 */
-std::vector<sf::CircleShape> Mesh::renderVertices(
+std::vector<sf::CircleShape> Mesh::getRenderVertices(
   sf::RenderWindow &window, std::vector<sf::Vector2f> &projectedVertices
 ) {
   std::vector<sf::CircleShape> renderedVertices;
   sf::IntRect viewport = window.getViewport(window.getView());
 
   sf::CircleShape tempShape(2);
-  tempShape.setFillColor(sf::Color(240, 240, 240));
+  tempShape.setFillColor(resources::ColorMap["VERTICES"]);
 
   for (auto vertex : projectedVertices) {
     if (viewport.contains(vertex.x, vertex.y)) {
@@ -197,24 +189,24 @@ std::vector<sf::CircleShape> Mesh::renderVertices(
  * @param projectedVertices A vector of vertices projected from 3D to 2D space
  * @return A vector of SFML vertex arrays to be rendered which are contained within the screen
 */
-std::vector<sf::VertexArray> Mesh::renderEdges(
+std::vector<sf::VertexArray> Mesh::getRenderEdges(
   sf::RenderWindow &window, std::vector<sf::Vector2f> &projectedVertices
 ) {
   std::vector<sf::VertexArray> renderedEdges;
   sf::FloatRect viewport = (sf::FloatRect) window.getViewport(window.getView());
-  sf::VertexArray vertices(sf::LinesStrip);
+  sf::VertexArray vertexArray(sf::LinesStrip);
 
   // TODO: Remove duplicate edges being drawn from intersecting faces
   for (auto face : faces) {
-    vertices.resize(face.size());
+    vertexArray.resize(face.size());
     for (int index = 0; index < face.size(); index++) {
-      vertices[index].position = projectedVertices.at( face[index].vertex - 1 );
-      vertices[index].color = sf::Color(240, 240, 240);
+      vertexArray[index].position = projectedVertices.at( face[index].vertex - 1 );
+      vertexArray[index].color = sf::Color(resources::ColorMap["VERTICES"]);
     }
 
-    if (vertices.getBounds().intersects(viewport))
-      renderedEdges.emplace_back(vertices);
-    vertices.clear();
+    if (vertexArray.getBounds().intersects(viewport))
+      renderedEdges.emplace_back(vertexArray);
+    vertexArray.clear();
   }
 
   return renderedEdges;
@@ -226,15 +218,15 @@ std::vector<sf::VertexArray> Mesh::renderEdges(
  * @param projectedVertices A vector of vertices projected from 3D to 2D space
  * @return A vector of SFML convex hull shapes to be rendered which are contained within the screen
 */
-std::vector<sf::ConvexShape> Mesh::renderFaces(
+std::vector<sf::ConvexShape> Mesh::getRenderFaces(
   sf::RenderWindow &window, std::vector<sf::Vector2f> &projectedVertices
 ) {
   std::vector<sf::ConvexShape> renderedFaces;
   sf::FloatRect viewport(window.getViewport(window.getView()));
 
   sf::ConvexShape tempShape;
-  tempShape.setFillColor(sf::Color(200, 200, 200, 50)); // Transparent grey
-  tempShape.setOutlineColor(sf::Color(240, 240, 240));
+  tempShape.setFillColor(resources::ColorMap["FACES"]);
+  tempShape.setOutlineColor(resources::ColorMap["VERTICES"]);
 
   // TODO: Remove faces rendering behind other faces
   for (auto face : faces) {

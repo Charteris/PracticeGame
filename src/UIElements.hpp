@@ -23,7 +23,6 @@ class Button : public Entity {
     };
     sf::Font font;
     sf::Text displayText;
-    sf::Texture idle, hovered, pressed;
     sf::Sprite graphic;
   
   public:
@@ -32,10 +31,7 @@ class Button : public Entity {
       std::string, 
       std::function<void()>, 
       sf::Vector2f pos = sf::Vector2f(),
-      sf::Vector2f s = sf::Vector2f(128.f, 64.f), 
-      std::string idleTextureName = "res/Button.png",
-      std::string hoveredTextureName = "res/ButtonHovered.png",
-      std::string pressedTextureName = "res/ButtonPressed.png"
+      sf::Vector2f s = sf::Vector2f(128.f, 64.f)
     );
     void instantiateButton(std::string, sf::Vector2f, sf::Vector2f);
     void onMouseHover();
@@ -54,12 +50,12 @@ class Input : public Entity {
     sf::Font font;
     sf::Text displayText, errorText;
     sf::RectangleShape errorBg;
-    sf::Texture idle, hovered, active, error;
     sf::Sprite graphic;
     sf::Vertex caret[2];
     sf::Clock clock;
     std::string input = "", errorString = "";
     bool isFocussed = false;
+    int caretIndex = 0;
   
   public:
     Input(
@@ -69,7 +65,7 @@ class Input : public Entity {
       sf::Vector2f s = sf::Vector2f(128.f, 32.f)
     );
     void instantiateInput(sf::Vector2f, sf::Vector2f);
-    void updateCaret();
+    void updateCaretPos();
     void onMouseHover();
     void onBlur();
     void interact(sf::Mouse::Button, bool isMouseReleased = false);
